@@ -1,15 +1,15 @@
-import {Reducer} from "react";
+import {AsyncReducer, ReducerResult} from "../shared/UseAsyncReducer";
 import {IntersectionAction} from "./actions/IntersectionActions";
 import {IntersectionViewState} from "./IntersectionViewState";
 import {CrossingRequestReducer} from "./reducers/CrossingRequestReducer";
 import {ResetReducer} from "./reducers/ResetReducer";
 
-export type IntersectionReducers = Reducer<IntersectionViewState, IntersectionAction>;
+export type IntersectionReducers = AsyncReducer<IntersectionViewState, IntersectionAction>;
 
 export type IntersectionReducer = (
 	state: IntersectionViewState,
 	params: IntersectionAction["params"]
-) => IntersectionViewState;
+) => ReducerResult<IntersectionViewState>;
 
 export const Reducers: IntersectionReducers = (state, action) => {
 
