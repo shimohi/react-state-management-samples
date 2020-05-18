@@ -1,13 +1,9 @@
-import React, {Dispatch} from "react";
+import React, {useContext} from "react";
 import {PedestrianSignalStates} from "../domain/entities/PedestrianSignal";
-import {IntersectionAction} from "../presenters/actions/IntersectionActions";
-import {IntersectionViewState} from "../presenters/IntersectionViewState";
+import {IntersectionContext} from "../presenters/contexts/IntersectionContext";
 
-export function PedestrianSignal(params: {
-    state: IntersectionViewState,
-    dispatcher: Dispatch<IntersectionAction>
-}) {
-    const {state} = params;
+export function PedestrianSignal() {
+    const {state} = useContext(IntersectionContext);
     return (
         <React.Fragment>
             <rect fill="#D8D8D8" x="0" y="0" width="105" height="216" rx="8" />

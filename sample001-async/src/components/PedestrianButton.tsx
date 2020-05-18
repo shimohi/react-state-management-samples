@@ -1,13 +1,9 @@
-import React, {Dispatch} from "react";
+import React, {useContext} from "react";
 import {PedestrianSignalStates} from "../domain/entities/PedestrianSignal";
-import {IntersectionAction} from "../presenters/actions/IntersectionActions";
-import {IntersectionViewState} from "../presenters/IntersectionViewState";
+import {IntersectionContext} from "../presenters/contexts/IntersectionContext";
 
-export function PedestrianButton(params: {
-    state: IntersectionViewState,
-    dispatcher: Dispatch<IntersectionAction>
-}) {
-    const {state, dispatcher} = params;
+export function PedestrianButton() {
+    const {state, dispatcher} = useContext(IntersectionContext);
     return (
         <React.Fragment>
             <rect fill="#D5BE2D" x="0" y="0" width="141" height="145" rx="8" />
@@ -20,10 +16,10 @@ export function PedestrianButton(params: {
                 state.pedestrianSignal === PedestrianSignalStates.Red ? "red" : "none"
             }>おしてください</text>
             <g style={{
-                cursor: state.pedestrianSignal === PedestrianSignalStates.Blue ? "not-allowed" : "pointer"
-            }} onClick={ state.pedestrianSignal === PedestrianSignalStates.Blue ? undefined: () => {
+                cursor: state.pedestrianSignal === PedestrianSignalStates.Red ? "pointer" : "not-allowed"
+            }} onClick={ state.pedestrianSignal === PedestrianSignalStates.Red ? () => {
                 dispatcher( { type:"crossingRequest"});
-            }}>
+            }:undefined}>
                 <ellipse stroke="#979797" strokeWidth="2" fill="#B23236" cx="71" cy="77" rx="21" ry="20"/>
             </g>
         </React.Fragment>
