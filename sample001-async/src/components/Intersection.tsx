@@ -14,12 +14,11 @@ export function Intersection() {
             <g transform="translate(150,45)" >
                 <PedestrianButton/>
             </g>
-            { /*リセット処理へのリンク*/ }
             <g transform="translate(150,90)" style={{
                 cursor: "pointer",
                 display: state.pedestrianSignal === PedestrianSignalStates.Blue ? undefined : "none"
             }} onClick={ () => {
-                dispatcher( { type:"reset"});
+                dispatcher.reset();
             }}>
                 <text x="70.5" y="125" textAnchor="middle" fontSize="12" fill={"blue"}>リセット</text>
             </g>

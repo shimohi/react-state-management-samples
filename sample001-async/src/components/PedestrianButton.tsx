@@ -12,17 +12,14 @@ export function PedestrianButton() {
             <rect fill="#0D0101" x="21" y="108" width="99" height="24" />
             <circle fill="#959595" cx="11.5" cy="77.5" r="6.5" />
             <circle fill="#959595" cx="130.5" cy="77.5" r="6.5" />
-            <text x="70.5" y="39" textAnchor="middle" fontSize="12" fill={
-                state.waiting ? "red" : "none"
-            }>おまちください</text>
+            <text x="70.5" y="39" textAnchor="middle" fontSize="12" fill="red">{ state.message }</text>
             <text x="70.5" y="125" textAnchor="middle" fontSize="12" fill={
                 ready ? "red" : "none"
             }>おしてください</text>
             <g style={{
                 cursor: ready ? "pointer" : "not-allowed"
-            }} onClick={
-                ready ? () => {
-                dispatcher( { type:"crossingRequest"});
+            }} onClick={ ready ? () => {
+                dispatcher.crossingRequest({ message: "おまちください"});
             }:undefined}>
                 <ellipse stroke="#979797" strokeWidth="2" fill="#B23236" cx="71" cy="77" rx="21" ry="20"/>
             </g>

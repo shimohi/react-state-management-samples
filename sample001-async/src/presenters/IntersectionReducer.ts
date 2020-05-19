@@ -1,24 +1,18 @@
 import {IntersectionUseCases} from "../domain/use_cases/IntersectionUseCases";
-import {AsyncReducer, ReducerResult} from "../shared/UseAsyncReducer";
-import {IntersectionAction} from "./actions/IntersectionActions";
+import {AsyncReducers, ReducerResult} from "../shared/UseAsyncReducer";
+import {IntersectionActions} from "./actions/IntersectionActions";
 import {IntersectionViewState} from "./IntersectionViewState";
 import {CrossingRequestReducer} from "./reducers/CrossingRequestReducer";
 import {ResetReducer} from "./reducers/ResetReducer";
 
-export type IntersectionReducers = AsyncReducer<IntersectionViewState, IntersectionAction, IntersectionUseCases>;
-
-export type IntersectionReducer = (
+export type IntersectionReducers = AsyncReducers<IntersectionViewState, IntersectionActions, IntersectionUseCases>;
+export type IntersectionReducer<K extends keyof IntersectionActions> = (
 	state: IntersectionViewState,
-	params: IntersectionAction["params"],
+	params: IntersectionActions[K],
 	useCases: IntersectionUseCases
 ) => ReducerResult<IntersectionViewState>;
 
-export const Reducers: IntersectionReducers = (state, action, useCases) => {
-
-	switch(action.type) {
-		case "crossingRequest":
-			return CrossingRequestReducer(state, action.params, useCases);
-		default:
-			return ResetReducer(state, action.params, useCases);
-	}
-}
+export const Reducers: IntersectionReducers = {
+	crossingRequest: CrossingRequestReducer,
+	reset: ResetReducer
+};

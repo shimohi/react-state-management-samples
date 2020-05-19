@@ -1,40 +1,45 @@
 import {Dispatch, MutableRefObject, SetStateAction, useRef, useState} from "react";
 
 export type ReducerResult<S> = Promise<S> | S | AsyncGenerator<S>;
-// export type AsyncReducer<S, P, > = (
 export type AsyncReducer<S, P, U> = (
 	state: S,
 	params: P,
-	useCases: U, //+
+	useCases: U,
 ) => ReducerResult<S>;
 
-// export function useAsyncReducer<S,P>(
-//  reducers: AsyncReducer<S, P>,
-export function useAsyncReducer<S,P, U>(
-	reducers: AsyncReducer<S, P, U>,
+export type AsyncReducers<S, A, U> = {
+	[P in keyof A]: AsyncReducer<S, A[P], U>
+};
+export type ActionDispatcher<A> = {
+	[P in keyof A]: A[P] extends undefined ? () => void : ( params: A[P] ) => void
+};
+
+export function useAsyncReducer<S, A, U>(
+	reducers: AsyncReducers<S, A, U>,
 	initialState: S,
 	useCases: U,
-): [S, Dispatch<P>] {
+): [S, ActionDispatcher<A>] {
 
 	const [state, setState] = useState<S>( initialState )
-	// const paramsRef = useRef<[AsyncReducer<S, P>,]>([reducers]);
-	const paramsRef = useRef<[AsyncReducer<S, P, U>, U]>([reducers, useCases]);
+	const paramsRef = useRef<[AsyncReducers<S, A, U>, U]>([reducers, useCases]);
 	const stateRef = useRef<{state:S, setState:Dispatch<SetStateAction<S>>}>({ state, setState});
-	const dispatcherRef = useRef<Dispatch<P> | null>(null);
+	const dispatcherRef = useRef<ActionDispatcher<A> | null>(null);
 
 	if ( !dispatcherRef.current ) {
-		dispatcherRef.current = (params: P) => {
-			// const [reducers] = paramsRef.current;
-			const [reducers, useCases] = paramsRef.current;
-			const {state} = stateRef.current;
-			// handleResult(reducers(state, params), stateRef);
-			handleResult(reducers(state, params, useCases), stateRef);
-		}
+		dispatcherRef.current = Object.keys(reducers).reduce(( res, actionName ) => {
+			const reducers = paramsRef.current[0];
+			const reducer = reducers[actionName as keyof A];
+			res[actionName as keyof A] = ((params: any) => {
+				const useCases = paramsRef.current[1]
+				const {state} = stateRef.current; //
+				handleResult(reducer(state, params, useCases), stateRef);
+			}) as any;
+			return res;
+		}, {} as ActionDispatcher<A>);
 	}
-	// paramsRef.current = [reducers];
 	paramsRef.current = [reducers, useCases];
 	stateRef.current = { state, setState};
-	return [state, dispatcherRef.current];
+	return [state, dispatcherRef.current!];
 }
 
 function handleResult<S, U>(
@@ -79,4 +84,3 @@ function isPromise(maybe: any): boolean {
 function isGenerator(maybe: any): boolean {
 	return !!(maybe.return && maybe.next && maybe.throw);
 }
-
