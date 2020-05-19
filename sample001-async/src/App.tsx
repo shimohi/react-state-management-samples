@@ -8,7 +8,7 @@ import {useAsyncReducer} from "./shared/UseAsyncReducer";
 function App() {
     const [state, dispatcher] = useAsyncReducer(
         Reducers,
-        {pedestrianSignal: PedestrianSignalStates.Red}
+        {pedestrianSignal: PedestrianSignalStates.Red, waiting: false }
     );
     return (
         <IntersectionContext.Provider value={{

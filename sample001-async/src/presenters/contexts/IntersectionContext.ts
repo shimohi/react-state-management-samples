@@ -7,7 +7,7 @@ export const IntersectionContext = createContext<{
 	state: IntersectionViewState,
 	dispatcher: Dispatch<IntersectionAction> }>(
 	{
-		state: { pedestrianSignal: PedestrianSignalStates.Red },
+		state: { pedestrianSignal: PedestrianSignalStates.Red, waiting: false },
 		dispatcher:() => {}
 	}
 );

@@ -1,6 +1,6 @@
 import {Dispatch, MutableRefObject, SetStateAction, useRef, useState} from "react";
 
-export type ReducerResult<S> = Promise<S> | S;
+export type ReducerResult<S> = Promise<S> | S | AsyncGenerator<S>;
 export type AsyncReducer<S, P, > = (
 	state: S,
 	params: P,
@@ -46,6 +46,16 @@ function handleResult<S, U>(
 		});
 		return;
 	}
+	if (isGenerator(result)) {
+		const generator = result as AsyncGenerator<S>
+		(async function() {
+			for await (const state of generator) {
+				const {setState} = stateRef.current;
+				setState(state);
+			}
+		})();
+		return;
+	}
 	const {setState} = stateRef.current;
 	setState(result as S);
 }
@@ -57,3 +67,12 @@ function handleResult<S, U>(
 function isPromise(maybe: any): boolean {
 	return !!(maybe.then && maybe.catch );
 }
+
+/**
+ * 指定されたオブジェクトがGeneratorかどうかを判別
+ * @param maybe
+ */
+function isGenerator(maybe: any): boolean {
+	return !!(maybe.return && maybe.next && maybe.throw);
+}
+
