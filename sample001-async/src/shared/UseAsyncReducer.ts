@@ -1,34 +1,38 @@
 import {Dispatch, MutableRefObject, SetStateAction, useRef, useState} from "react";
 
 export type ReducerResult<S> = Promise<S> | S | AsyncGenerator<S>;
-export type AsyncReducer<S, P, > = (
+// export type AsyncReducer<S, P, > = (
+export type AsyncReducer<S, P, U> = (
 	state: S,
 	params: P,
+	useCases: U, //+
 ) => ReducerResult<S>;
 
-/**
- * 非同期処理用カスタムフックの実装
- * @param reducers
- * @param initialState
- */
-export function useAsyncReducer<S,P>(
-	reducers: AsyncReducer<S, P>,
+// export function useAsyncReducer<S,P>(
+//  reducers: AsyncReducer<S, P>,
+export function useAsyncReducer<S,P, U>(
+	reducers: AsyncReducer<S, P, U>,
 	initialState: S,
+	useCases: U,
 ): [S, Dispatch<P>] {
 
 	const [state, setState] = useState<S>( initialState )
-	const paramsRef = useRef<[AsyncReducer<S, P>,]>([reducers]);
+	// const paramsRef = useRef<[AsyncReducer<S, P>,]>([reducers]);
+	const paramsRef = useRef<[AsyncReducer<S, P, U>, U]>([reducers, useCases]);
 	const stateRef = useRef<{state:S, setState:Dispatch<SetStateAction<S>>}>({ state, setState});
 	const dispatcherRef = useRef<Dispatch<P> | null>(null);
 
 	if ( !dispatcherRef.current ) {
 		dispatcherRef.current = (params: P) => {
-			const [reducers] = paramsRef.current;
+			// const [reducers] = paramsRef.current;
+			const [reducers, useCases] = paramsRef.current;
 			const {state} = stateRef.current;
-			handleResult(reducers(state, params), stateRef);
+			// handleResult(reducers(state, params), stateRef);
+			handleResult(reducers(state, params, useCases), stateRef);
 		}
 	}
-	paramsRef.current = [reducers];
+	// paramsRef.current = [reducers];
+	paramsRef.current = [reducers, useCases];
 	stateRef.current = { state, setState};
 	return [state, dispatcherRef.current];
 }
